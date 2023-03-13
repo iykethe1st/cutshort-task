@@ -45,10 +45,7 @@ router.put("/:id", auth, async function (req, res, next) {
   let post = await Post.findById(req.params.id);
   if (!post) return res.status(404).send("Post not found");
 
-  post.comments.push({
-    name: req.body.name,
-    comment: req.body.comment,
-  });
+  post.comments.push(req.body.comment);
 
   post = await post.save();
 

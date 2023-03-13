@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { saveTodo } from "../services/todoService";
 import { toast } from "react-toastify";
 
-const NewToDo = ({ user, todo, label }) => {
+const NewToDo = ({ user, todo, label, onAddedToDo }) => {
   const [newTodo, setNewToDo] = useState({});
 
   const handleChange = ({ currentTarget: input }) => {
@@ -19,9 +19,8 @@ const NewToDo = ({ user, todo, label }) => {
       todoData.userId = user._id;
       await saveTodo(todoData);
       toast.success("To Do added successfully");
-      setTimeout(() => {
-        window.location = "/";
-      }, 1000);
+      onAddedToDo();
+      setNewToDo({});
     } catch (err) {}
   };
 
@@ -32,7 +31,7 @@ const NewToDo = ({ user, todo, label }) => {
         description: todo.description,
       });
     }
-  }, [todo]);
+  }, []);
 
   return (
     <div className="flex gap-4 flex-col p-8 items-start">
@@ -45,7 +44,7 @@ const NewToDo = ({ user, todo, label }) => {
             placeholder="Title"
             name="title"
             onChange={handleChange}
-            value={newTodo.title}
+            value={newTodo.title || ""}
           />
           <textarea
             className="border-2 rounded p-2"
@@ -55,7 +54,7 @@ const NewToDo = ({ user, todo, label }) => {
             placeholder="Add To Do..."
             name="description"
             onChange={handleChange}
-            value={newTodo.description}
+            value={newTodo.description || ""}
           />
           <Button label="Add" />
         </div>

@@ -31,20 +31,7 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  comments: [
-    {
-      type: new Schema({
-        name: {
-          type: String,
-          required: true,
-        },
-        comment: {
-          type: String,
-          required: true,
-        },
-      }),
-    },
-  ],
+  comments: [{ type: String }],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -64,7 +51,6 @@ function validate(post) {
 
 function validateComment(comment) {
   const schema = Joi.object({
-    name: Joi.string().required(),
     comment: Joi.string().required(),
   });
   return schema.validate(comment);

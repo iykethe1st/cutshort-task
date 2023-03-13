@@ -42,6 +42,13 @@ const ToDo = ({ user }) => {
     setAddToDo(true);
   };
 
+  const handleAddedToDo = async () => {
+    // setAddPost(false);
+    // setActivePost(null);
+    const { data } = await getTodos();
+    setTodo(data);
+  };
+
   useEffect(() => {
     async function fetchData() {
       const { data } = await getTodos();
@@ -88,7 +95,9 @@ const ToDo = ({ user }) => {
           </div>
         )}
       </div>
-      {addToDo && <NewToDo user={user} label="New To Do" />}
+      {addToDo && (
+        <NewToDo user={user} label="New To Do" onAddedToDo={handleAddedToDo} />
+      )}
     </div>
   );
 };

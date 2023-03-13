@@ -1,53 +1,61 @@
 import { useEffect, useState } from "react";
 import Button from "../components/Button";
-import NewPost from "../components/NewPost";
 import NewToDo from "../components/NewToDo";
 import Posts from "../components/Posts";
 import ToDo from "../components/ToDo";
 import auth from "../services/authService";
+import { getUsers } from "../services/userService";
+import UserDetails from "../components/UserDetails";
 
 const Home = () => {
   const [currentUser, setCurrentUser] = useState("");
   const [showPosts, setShowPosts] = useState(false);
   const [showToDo, setShowToDo] = useState(true);
   const [addToDo, setAddToDo] = useState(false);
-  const [addPost, setAddPost] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [showUser, setShowUser] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   function handlePostClick() {
     setShowPosts(true);
     setShowToDo(false);
     setAddToDo(false);
-    setAddPost(false);
+    setShowUser(false);
   }
 
   function handleToDoClick() {
     setShowToDo(true);
     setShowPosts(false);
     setAddToDo(false);
-    setAddPost(false);
+    setShowUser(false);
   }
-  function handleAddToDo() {
-    setAddToDo(true);
+
+  const handleUserClick = (user) => {
+    setSelectedUser(user);
+    console.log(user);
+    setShowUser(true);
     setShowPosts(false);
     setShowToDo(false);
-    setAddPost(false);
-  }
-  function handleAddPost() {
-    setAddPost(true);
     setAddToDo(false);
-    setShowPosts(false);
-    setShowToDo(false);
-  }
+  };
+
   function handleShowPosts() {
     setShowPosts(true);
     setShowToDo(false);
     setAddToDo(false);
-    setAddPost(false);
+    setShowUser(false);
   }
 
   useEffect(() => {
-    const user = auth.getCurrentUser();
-    setCurrentUser(user);
+    const fetchData = async () => {
+      const user = auth.getCurrentUser();
+      const { data } = await getUsers();
+      setCurrentUser(user);
+      setAllUsers(data);
+      console.log(data);
+    };
+    fetchData();
   }, []);
 
   return (
@@ -60,11 +68,22 @@ const Home = () => {
             id="search"
             placeholder="search"
             className="p-2 rounded w-2/3"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </form>
-        <div className="flex gap-4">
-          <Button onClick={handleAddToDo} label="Add To Do" />
-        </div>
+        {allUsers
+          .filter((user) =>
+            user.name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((user) => (
+            <div
+              onClick={() => handleUserClick(user)}
+              className="border-slate-100 border-b-2 cursor-pointer hover:bg-slate-300 active:bg-slate-400 "
+            >
+              {user.name}
+            </div>
+          ))}
       </div>
       <div className="flex w-3/4">
         <div>
@@ -74,6 +93,7 @@ const Home = () => {
 
           {addToDo && <NewToDo user={currentUser} />}
           {showToDo && <ToDo user={currentUser} />}
+          {showUser && <UserDetails user={selectedUser} />}
         </div>
         <div className="flex gap-4 h-[4rem] py-4 px-6 justify-end w-3/4">
           <Button onClick={handlePostClick} label="Posts" />
